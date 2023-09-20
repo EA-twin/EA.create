@@ -1,0 +1,223 @@
+<!DOCTYPE html>
+<html>
+ <head>
+  <meta charset="utf-8"><!-- 文字コードの指定-->
+    <link rel="stylesheet" href="dentaku.css"><!-- CSSファイルの指定-->
+    <script src="https://code.jquery.com/jquery-3.5.1.min.js"></script><!-- インターネット上のjQueryを参照して、下記のJavascriptを動作させる為の記述-->
+  <title>電卓アプリ</title><!-- タイトル名-->
+ </head>
+ <body>
+   <div class="wrapper">
+     <div id="calc">
+       <div>
+         <input readonly id="result" size="48" type="text" value="0"><!-- 数字の表示画面-->
+       </div>
+       <div>
+         <button onclick="back_click(this.innerHTML)">▷</button><!-- 戻るボタン-->
+         <button onclick="num_click(this.innerHTML)">7</button><!-- 7ボタン-->
+         <button onclick="num_click(this.innerHTML)">8</button><!-- 8ボタン-->
+         <button onclick="num_click(this.innerHTML)">9</button><!-- 9ボタン-->
+         <button onclick="waru_click(this.innerHTML)">÷</button><!-- ÷ボタン-->
+       </div>
+       <div>
+         <button onclick="c_click()">C</button><!-- Cボタン-->
+         <button onclick="num_click(this.innerHTML)">4</button><!-- 4ボタン-->
+         <button onclick="num_click(this.innerHTML)">5</button><!-- 5ボタン-->
+         <button onclick="num_click(this.innerHTML)">6</button><!-- 6ボタン-->
+         <button onclick="kakel_click(this.innerHTML)">×</button><!-- ×ボタン-->
+       </div>
+       <div>
+         <button onclick="clearAll()">AC</button><!-- オールクリアボタン-->
+         <button onclick="num_click(this.innerHTML)">1</button><!-- 1ボタン-->
+         <button onclick="num_click(this.innerHTML)">2</button><!-- 2ボタン-->
+         <button onclick="num_click(this.innerHTML)">3</button><!-- 3ボタン-->
+         <button onclick="mainasu_click(this.innerHTML)">-</button><!-- －ボタン -->
+       </div>
+       <div>
+         <button onclick="num_click(this.innerHTML)">0</button><!-- 0ボタン-->
+         <button onclick="num_click(this.innerHTML)">00</button><!-- 00ボタン-->
+         <button onclick="dot_click()">.</button><!-- 小数点ボタン-->
+         <button onclick="equal_click()">=</button><!-- =ボタン -->
+         <button onclick="plus_click(this.innerHTML)">+</button><!-- +ボタン -->
+       </div>
+     </div>
+   </div>
+
+   <script><!-- Javascriptの命令を動作させるタグ-->
+   
+   // 空白の文字列や0で初期化する為の変数を宣言
+   var math = "";
+   var hozo = "";
+   var answer = 0;
+   var enzan = "";
+
+
+	// 数字キー押下
+    function num_click(val){
+        math += val;
+        $("#result").val(math);
+    }
+
+
+	// 小数点キー押下
+    function dot_click(){
+        if(math.indexOf('.') === -1){
+            math += '.';
+            $("#result").val(math);
+        }
+    }
+
+
+	// +ボタンキー押下
+    function plus_click(){
+        if(hozo === ""){
+            hozo = parseFloat(math);
+            math = "";
+            enzan = "+";
+        } else {
+            if(enzan === "+"){
+                answer = hozo + parseFloat(math);
+                hozo = answer;
+            } else if(enzan === "-"){
+                answer = hozo - parseFloat(math);
+                hozo = answer;
+            } else if(enzan === "*"){
+                answer = hozo * parseFloat(math);
+                hozo = answer;
+            } else if(enzan === "/"){
+                answer = hozo / parseFloat(math);
+                hozo = answer;
+            }
+            math = "";
+            enzan = "+";
+            $("#result").val(answer);
+        }
+    }
+
+
+	// -ボタンキー押下
+    function mainasu_click(){
+        if(hozo === ""){
+            hozo = parseFloat(math);
+            math = "";
+            enzan = "-";
+        } else {
+            if(enzan === "+"){
+                answer = hozo + parseFloat(math);
+                hozo = answer;
+            } else if(enzan === "-"){
+                answer = hozo - parseFloat(math);
+                hozo = answer;
+            } else if(enzan === "*"){
+                answer = hozo * parseFloat(math);
+                hozo = answer;
+            } else if(enzan === "/"){
+                answer = hozo / parseFloat(math);
+                hozo = answer;
+            }
+            math = "";
+            enzan = "-";
+            $("#result").val(answer);
+        }
+    }
+
+
+	// ×ボタンキー押下
+    function kakel_click(){
+        if(hozo === ""){
+            hozo = parseFloat(math);
+            math = "";
+            enzan = "*";
+        } else {
+            if(enzan === "+"){
+                answer = hozo + parseFloat(math);
+                hozo = answer;
+            } else if(enzan === "-"){
+                answer = hozo - parseFloat(math);
+                hozo = answer;
+            } else if(enzan === "*"){
+                answer = hozo * parseFloat(math);
+                hozo = answer;
+            } else if(enzan === "/"){
+                answer = hozo / parseFloat(math);
+                hozo = answer;
+            }
+            math = "";
+            enzan = "*";
+            $("#result").val(answer);
+        }
+    }
+
+
+	// ÷ボタンキー押下
+    function waru_click(){
+        if(hozo === ""){
+            hozo = parseFloat(math);
+            math = "";
+            enzan = "/";
+        } else {
+            if(enzan === "+"){
+                answer = hozo + parseFloat(math);
+                hozo = answer;
+            } else if(enzan === "-"){
+                answer = hozo - parseFloat(math);
+                hozo = answer;
+            } else if(enzan === "*"){
+                answer = hozo * parseFloat(math);
+                hozo = answer;
+            } else if(enzan === "/"){
+                answer = hozo / parseFloat(math);
+                hozo = answer;
+            }
+            math = "";
+            enzan = "/";
+            $("#result").val(answer);
+        }
+    }
+
+
+	// ＝キー押下
+    function equal_click(){
+        if (enzan === "+") {
+            answer = hozo + parseFloat(math);
+        } else if(enzan === "-") {
+            answer = hozo - parseFloat(math);
+        } else if(enzan === "*") {
+            answer = hozo * parseFloat(math);
+        } else if(enzan === "/") {
+            answer = hozo / parseFloat(math);
+        }
+        answer = answer.toFixed(1); // 少数第一位に丸める
+        $("#result").val(answer);
+    }
+
+
+	// Cボタンキー押下
+	function c_click() {
+	    if (hozo !== "") {
+	        math = "";
+	    }
+	    hozo = "";
+	    $("#result").val("0");
+	}
+
+
+	// ACボタンキー押下
+    function clearAll() {
+        math = "";
+        hozo = "";
+        $("#result").val("0");
+    }
+
+
+	// 戻るボタンキー押下
+    function back_click() {
+        math = math.toString().slice(0, -1);
+        if (math === "") {
+            math = "0";
+        }
+        $("#result").val(math);
+    }
+   </script>
+ </body>
+</html>

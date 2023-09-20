@@ -1,0 +1,55 @@
+<html>
+	<head>
+		<meta charset="utf-8">
+	    <link rel="stylesheet" href="location_input1.css">
+	    <script src="https://yubinbango.github.io/yubinbango/yubinbango.js" charset="UTF-8"></script>
+	    <title>住所入力ツール</title>
+	</head>
+	
+	<body>
+		<div class="col-12 px-2">
+		    <form action="" class="h-adr" method="post">
+		        <span class="p-country-name" style="display:none;">Japan</span>
+		        <div class="card card-info mt-4">
+		            <div class="card-header">
+		                <h3 class="card-title">郵便番号 自動入力</h3>
+		            </div>
+		            <div class="form-horizontal">
+		                <div class="card-body">
+		                    <div class="form-group row">
+		                        <label for="zip_code" class="col-1 col-form-label">郵便番号</label>
+		                        <div class="col-3">
+		                            <input type="text" name="zip_code" id="zip_code" placeholder="郵便番号を入力してください" class="p-postal-code form-control" value="">
+		                        </div>
+		                    </div>
+		                    <div class="form-group row">
+		                        <label for="prefecture_name" class="col-1 col-form-label">都道府県</label>
+		                        <div class="col-3">
+		                            <input type="text" id="prefecture_name" class="p-region form-control" value="">
+		                        </div>
+		                    </div>
+		                    <div class="form-group row">
+		                        <label for="city_name" class="col-1 col-form-label">市区町村</label>
+		                        <div class="col-3">
+		                            <input type="text" id="city_name" class="p-locality form-control" value="">
+		                        </div>
+		                    </div>
+		                    <div class="form-group row">
+		                        <label for="town_name" class="col-1 col-form-label">町域</label>
+		                        <div class="col-3">
+		                            <input type="text" id="town_name" class="p-street-address form-control" value="">
+		                        </div>
+		                    </div>
+		                    <div class="form-group row">
+		                        <label for="extended_address_name" class="col-1 col-form-label">その他住所</label>
+		                        <div class="col-3">
+		                            <input type="text" id="extended_address_name" class="p-extended-address form-control" value="">
+		                        </div>
+		                    </div>
+		                </div>
+		            </div>
+		        </div>
+		    </form>
+		</div>
+	</body>
+</html>

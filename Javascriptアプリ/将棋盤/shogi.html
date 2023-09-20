@@ -1,0 +1,71 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>変則将棋アプリ</title>
+    <style>
+        .board {
+            display: grid;
+            grid-template-columns: repeat(9, 50px);
+            grid-template-rows: repeat(9, 50px);
+            border: 1px solid #000;
+        }
+        .square {
+            width: 50px;
+            height: 50px;
+            border: 1px solid #000;
+            text-align: center;
+            line-height: 50px;
+            cursor: pointer;
+        }
+    </style>
+</head>
+<body>
+    <div class="board" id="board"></div>
+    
+    <script>
+        const boardElement = document.getElementById('board');
+        let selectedPiece = null;
+
+        function createBoard() {
+            for (let i = 0; i < 9; i++) {
+                for (let j = 0; j < 9; j++) {
+                    const square = document.createElement('div');
+                    square.classList.add('square');
+                    square.dataset.row = i;
+                    square.dataset.col = j;
+                    square.textContent = `${i}-${j}`;
+                    square.addEventListener('click', handleClick);
+                    boardElement.appendChild(square);
+                }
+            }
+        }
+
+        function handleClick(event) {
+            const square = event.target;
+            const row = square.dataset.row;
+            const col = square.dataset.col;
+
+            if (!selectedPiece) {
+                // 駒が選択されていない場合、選択された駒を保持する
+                selectedPiece = { row, col };
+                square.style.backgroundColor = 'lightblue';
+            } else {
+                // 移動先がクリックされた場合、駒を移動させる
+                const fromRow = selectedPiece.row;
+                const fromCol = selectedPiece.col;
+                // TODO: ルールに基づいた移動の妥当性をチェックする
+                // ここにルールのチェックを追加
+
+                // 駒を移動させる処理
+                square.textContent = `${fromRow}-${fromCol}`;
+                square.style.backgroundColor = '';
+                selectedPiece = null;
+            }
+        }
+
+        createBoard();
+    </script>
+</body>
+</html>

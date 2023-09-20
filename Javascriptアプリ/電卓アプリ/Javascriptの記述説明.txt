@@ -1,0 +1,234 @@
+Javascriptの電卓アプリで以下の記述の意味を教えて   
+
+<script><!-- Javascriptの命令を動作させるタグ-->
+   
+   // 空白の文字列や0で初期化する為の変数を宣言
+   var math = "";
+   var hozo = "";
+   var answer = 0;
+   var enzan = "";
+
+
+	// 数字キー押下
+    function num_click(val){
+        math += val;
+        $("#result").val(math);
+    }
+
+・num_click(val) は、数字キーが押されたときに呼び出される関数です。val は、押されたキーの値を表します。
+・math += val; は、math という変数に val を連結することで、計算式を作成しています。例えば、1 と + と 2 を押した場合、math の値は 1+2 になります。
+・$("#result").val(math); は、jQuery1 のメソッドを使って、画面上の result という id を持つ要素（電卓のディスプレイ）に math の値を表示しています。
+
+
+
+
+	// 小数点キー押下
+    function dot_click(){
+        if(math.indexOf('.') === -1){
+            math += '.';
+            $("#result").val(math);
+        }
+    }
+
+・function dot_click()は、小数点キーがクリックされたときに呼び出される関数の名前です。
+・if(math.indexOf('.') === -1)は、mathという変数に小数点が含まれていないかどうかをチェックする条件文です。mathは、入力された数式を表す変数です。indexOf('.')は、文字列の中で小数点が最初に出現する位置を返すメソッドです。 小数点が見つからなかった場合は、-1を返します。 したがって、この条件文は、mathに小数点が含まれていない場合に真になります。
+・math += '.'は、mathの末尾に小数点を追加する代入文です。+=は、左辺の変数に右辺の値を加えて代入する演算子です。 例えば、mathが"3+5"だった場合、この文を実行すると"3+5."になります。
+・$("#result").val(math)は、画面上の結果表示欄にmathの値を表示する文です。$("#result")は、id属性が"result"であるHTML要素を選択するjQueryオブジェクトです。 val(math)は、その要素のvalue属性にmathの値を設定するメソッドです。 例えば、上記の例では、結果表示欄に"3+5."と表示されます。
+
+
+
+	// +ボタンキー押下
+    function plus_click(){
+        if(hozo === ""){
+            hozo = parseFloat(math);
+            math = "";
+            enzan = "+";
+        } else {
+            if(enzan === "+"){
+                answer = hozo + parseFloat(math);
+                hozo = answer;
+            } else if(enzan === "-"){
+                answer = hozo - parseFloat(math);
+                hozo = answer;
+            } else if(enzan === "*"){
+                answer = hozo * parseFloat(math);
+                hozo = answer;
+            } else if(enzan === "/"){
+                answer = hozo / parseFloat(math);
+                hozo = answer;
+            }
+            math = "";
+            enzan = "+";
+            $("#result").val(answer);
+        }
+    }
+
+・hozo: 保持する数値
+・math: 入力する数値
+・enzan: 演算子
+・answer: 答え
+
+(parseFloatを使用している理由は、小数点の計算にも対応させる為)
+parseInt() は文字列 str を、整数に変換します。 parseFloat() は浮動小数点数に変換します。
+
+関数の処理は以下の通りです。
+
+・hozoが空文字列かどうかを判定します。空文字列ならば、mathを数値に変換してhozoに代入し、mathを空文字列にし、enzanに"+"を代入します。これは、最初の数値と演算子を入力したときの処理です。
+・hozoが空文字列でなければ、enzanの値に応じて、hozoとmathを数値に変換して計算します。計算結果はanswerに代入し、hozoにも代入します。これは、二つ目以降の数値と演算子を入力したときの処理です。
+・次に、mathを空文字列にし、enzanに"+"を代入します。これは、次の計算のために変数を初期化する処理です。
+・最後に、$("#result").val(answer)で、計算結果を画面に表示します。
+(以下のー、×、÷　のボタンを押した時も同様)
+
+
+	// -ボタンキー押下
+    function mainasu_click(){
+        if(hozo === ""){
+            hozo = parseFloat(math);
+            math = "";
+            enzan = "-";
+        } else {
+            if(enzan === "+"){
+                answer = hozo + parseFloat(math);
+                hozo = answer;
+            } else if(enzan === "-"){
+                answer = hozo - parseFloat(math);
+                hozo = answer;
+            } else if(enzan === "*"){
+                answer = hozo * parseFloat(math);
+                hozo = answer;
+            } else if(enzan === "/"){
+                answer = hozo / parseFloat(math);
+                hozo = answer;
+            }
+            math = "";
+            enzan = "-";
+            $("#result").val(answer);
+        }
+    }
+
+
+	// ×ボタンキー押下
+    function kakel_click(){
+        if(hozo === ""){
+            hozo = parseFloat(math);
+            math = "";
+            enzan = "*";
+        } else {
+            if(enzan === "+"){
+                answer = hozo + parseFloat(math);
+                hozo = answer;
+            } else if(enzan === "-"){
+                answer = hozo - parseFloat(math);
+                hozo = answer;
+            } else if(enzan === "*"){
+                answer = hozo * parseFloat(math);
+                hozo = answer;
+            } else if(enzan === "/"){
+                answer = hozo / parseFloat(math);
+                hozo = answer;
+            }
+            math = "";
+            enzan = "*";
+            $("#result").val(answer);
+        }
+    }
+
+
+	// ÷ボタンキー押下
+    function waru_click(){
+        if(hozo === ""){
+            hozo = parseFloat(math);
+            math = "";
+            enzan = "/";
+        } else {
+            if(enzan === "+"){
+                answer = hozo + parseFloat(math);
+                hozo = answer;
+            } else if(enzan === "-"){
+                answer = hozo - parseFloat(math);
+                hozo = answer;
+            } else if(enzan === "*"){
+                answer = hozo * parseFloat(math);
+                hozo = answer;
+            } else if(enzan === "/"){
+                answer = hozo / parseFloat(math);
+                hozo = answer;
+            }
+            math = "";
+            enzan = "/";
+            $("#result").val(answer);
+        }
+    }
+
+
+	// ＝キー押下
+    function equal_click(){
+        if (enzan === "+") {
+            answer = hozo + parseFloat(math);
+        } else if(enzan === "-") {
+            answer = hozo - parseFloat(math);
+        } else if(enzan === "*") {
+            answer = hozo * parseFloat(math);
+        } else if(enzan === "/") {
+            answer = hozo / parseFloat(math);
+        }
+	answer = answer.toFixed(1); // 少数第一位に丸める(←これがないと計算結果時、少数点の桁が大きくなる)
+        $("#result").val(answer);
+    }
+
+・enzanという変数に保存されている演算子（+、-、*、/）によって、計算の方法を分岐します。
+・hozoという変数に保存されている前の数値と、mathという変数に保存されている現在の数値を演算子に従って計算します。mathは文字列なので、parseFloat関数で数値に変換します。
+・計算結果をanswerという変数に代入します。
+・answerの値を#resultというidを持つ要素のテキストボックスに表示します。
+
+
+	// Cボタンキー押下
+	function c_click() {
+	    if (hozo !== "") {
+	        math = "";
+	    }
+	    hozo = "";
+	    $("#result").val("0");
+	}
+
+・Cボタンがクリックされたときに、hozoが空でない場合には mathが消去されるようになります
+(最後に入力した数値だけを消去する。)
+
+
+	// ACボタンキー押下
+    function clearAll() {
+        math = "";
+        hozo = "";
+        $("#result").val("0");
+    }
+
+・hozoとmathを空文字列にします。これは、計算をリセットする処理です。
+・次に、$("#result").val("0")で、画面に表示される要素の値を"0"にします。これは、画面をクリアする処理です。
+(ACボタンがクリックされたときに、計算した情報をすべて消去する)
+
+
+【CボタンとACボタンの違い】
+Cボタンは計算式を保持しながら計算結果をクリアするのに対し、ACボタンは計算式も計算結果もクリアするということです。例えば、2 + 3 = 5という計算をした後に、Cボタンを押すと、画面には0が表示されますが、+ 3と入力すると、5 + 3 = 8という計算が続けられます。
+ACボタンを押すと、画面には0が表示されますが、+ 3と入力しても、0 + 3 = 3という計算になります。
+Cボタンは一時的に計算結果を消すだけ
+ACボタンは完全に計算をリセットする
+
+
+
+	// 戻るボタンキー押下
+    function back_click() {
+        math = math.toString().slice(0, -1);
+        if (math === "") {
+            math = "0";
+        }
+        $("#result").val(math);
+    }
+
+・function back_click() は、戻るボタンキーが押されたときに実行される関数です。
+・math = math.toString().slice(0, -1) は、math という変数に入っている数式を文字列に変換して、最後の一文字を削除するという処理です。例えば、math が 123+45 だったら、123+4 になります。
+・if (math === "") は、math が空文字列になったかどうかを判定する条件分岐です。空文字列とは、何も文字が入っていない状態のことです。
+・math = "0" は、math が空文字列になった場合に、math に "0" を代入するという処理です。これは、電卓の画面に 0 を表示するために必要です。
+・$("#result").val(math) は、jQueryというライブラリを使って、HTMLの中の id="result" という属性を持つ要素（電卓の画面）に、math の値（数式）を表示するという処理
+
+
+   </script>

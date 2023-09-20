@@ -1,0 +1,12 @@
+body{
+	font-size: 10px;
+	color:#ff0000;
+}
+
+button{
+  font-size: 18px;
+  width: 72px;
+  height: 40px;
+  color: #333;
+  border-color: #fff;
+} 
