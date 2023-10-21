@@ -1,0 +1,116 @@
+<!--AUC_EDITOR_SOURCE--><!--AUC_EDITOR_SOURCE-->
+<title></title>
+<font rwr="1" style="font-family: Arial; font-size: 14pt;"><font rwr="1" style=""><meta charset="utf-8"><meta http- equiv="X-UA-Compatible" content="IE=edge"><meta name="viewport" content="width=device-width, initial-scale=1"> </font></font>
+<link href="#" media="screen" rel="stylesheet" /><font rwr="1" style="font-family: Arial; font-size: 14pt;"><font rwr="1" style="">
+<style type="text/css">@import url(https://fonts.googleapis.com/css?family=Roboto+Condensed);
+@import url(https://fonts.googleapis.com/css?family=Open+Sans);
+h1 {
+font-family: 'Roboto Condensed', sans-serif;
+text-align: center;
+}
+.heavy {
+background: #fff001;
+color: #505050;
+text-shadow: 1px 1px 1px rgba(255, 255, 255, 0.5);
+}
+#main h2{
+font-family: 'Roboto Condensed', sans-serif;
+color: #505050;
+background: linear-gradient(transparent 60%, #fff001 10%);
+text-shadow: 1px 1px 1px rgba(255, 255, 255, 0.5);
+}
+#main_desc{
+font-family: 'Open Sans', sans-serif;
+margin-bottom:3em;
+}
+.dec_img{
+margin:15px 120px;
+}
+section{
+margin-bottom:2em;
+}
+ul {
+font-family: 'Roboto Condensed', sans-serif;
+line-height: 18px;
+list-style-type: square;
+color: #333;
+text-align: left;
+}
+/* MEDIA QUERIES */@media only screen and (max-width: 414px) {
+section, h1 {
+display: none;
+}
+.dec_img{
+display: none;
+}
+}
+@media only screen and (max-width: 767px) {
+.dec_img{
+display: none;
+}
+}
+</style>
+</font></font>
+<article id="main" style="">
+<h1 class="heavy" style="font-family: Arial; font-size: 14pt;"><font rwr="1" style=""><font rwr="1" style=""><font style="vertical-align: inherit;"><font style="vertical-align: inherit;"><font style="vertical-align: inherit;"><font style="vertical-align: inherit;">Yugioh Card!&nbsp; Rare Japanese </font></font></font></font></font></font></h1>
+
+<section class="shiharai" style="font-family: Arial;">
+<h2 style="font-size: 14pt;">Payment</h2>
+
+<p style=""><font size="4">Managed Payments</font><br style="font-size: large;" />
+<span style="font-size: large;">Please make a payment with in 3 days</span></p>
+</section>
+
+<section class="hasso" style="">
+<h2 style="font-family: Arial; font-size: 14pt;">Shipping</h2>
+
+<p style="font-family: Arial; font-size: 14pt;"><span style="font-size: large;">Standard Shipping&nbsp;</span><br />
+Expedited <span style="font-size: large;">Shipping</span></p>
+
+<h2 style="font-family: Arial; font-size: 14pt;">Description of item</h2>
+
+<p style=""><font face="Arial"><span style="font-size: 18.6667px;">Condition:&nbsp;used. There are some scratches, but it is in good condition.</span></font></p>
+
+<p style=""><font face="Arial"><font face="Arial"><span style="font-size: 18.6667px;">Brand:&nbsp;</span></font><span style="font-size:18px; ">Yu-Gi-Oh</span></font></p>
+
+<p style=""><font face="Arial"><font face="Arial"><span style="font-size: 18.6667px;">Country: Japan</span></font></font></p>
+
+<p style=""><font face="Arial"><font face="Arial"><span style="font-size: 18.6667px;">Language: Japanese</span></font></font></p>
+</section>
+
+<section class="tyuui" style="font-family: Arial; font-size: 14pt;">
+<h2><font face="Arial">International Buyers - Please Note</font></h2>
+
+<div>
+<ul style="font-size: large;">
+	<li><font face="Arial">Import duties, taxes and charges are not included in the item price or shipping charges. These charges are the buyer&rsquo;s responsibility.</font></li>
+	<li><font face="Arial">Please check with your country&rsquo;s customs office to determine what these additional costs will be prior to bidding/buying.</font></li>
+	<li><font face="Arial">These charges are normally collected by the delivering freight (shipping) company or when you pick the item up - do not confuse them for additional shipping charges.</font></li>
+	<li><font face="Arial">We do not mark merchandise values ​​​​below value or mark items as &ldquo;gifts&rdquo; - US and International government regulations prohibit such behavior.</font></li>
+</ul>
+</div>
+</section>
+</article>
+<font face="Arial"> </font>
+
+<div id="tt" style="opacity: 0; display: none; width: 300px; top: 690px; left: 432px;">
+<div id="tttop">&nbsp;</div>
+
+<div id="ttcont" style="font-size: 100%;"><font face="Arial">used. Good product condition.</font></div>
+
+<div id="ttbot">&nbsp;</div>
+</div>
+<font face="Arial"> </font>
+
+<div id="tt" style="opacity: 0; display: none; width: 300px; top: 3px; left: 177px;">
+<div id="tttop">&nbsp;</div>
+
+<div id="ttcont" style="font-size: 100%;"><font face="Arial">Sony PlayStation 1</font></div>
+
+<div id="ttbot">&nbsp;</div>
+</div>
+<font face="Arial"> </font>
+
+<div id="gtx-trans" style="position: absolute; left: 90px; top: 421.614px;">
+<div class="gtx-trans-icon"><font face="Arial">&nbsp;</font></div>
+</div>

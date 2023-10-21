@@ -1,0 +1,114 @@
+<!--AUC_EDITOR_SOURCE--><!--AUC_EDITOR_SOURCE-->
+<title></title>
+<font rwr="1" style="font-family: Arial; font-size: 14pt;"><font rwr="1" style=""><meta charset="utf-8"><meta http-equiv="X-UA-Compatible" content="IE=edge"><meta name="viewport" content="width=device-width, initial-scale=1"> </font></font>
+<link href="#" media="screen" rel="stylesheet" /><font rwr="1" style="font-family: Arial; font-size: 14pt;"><font rwr="1" style="">
+<style type="text/css">@import url(https://fonts.googleapis.com/css?family=Roboto+Condensed);
+@import url(https://fonts.googleapis.com/css?family=Open+Sans);
+h1 {
+font-family: 'Roboto Condensed', sans-serif;
+text-align: center;
+}
+.heavy {
+background: #fff001;
+color: #505050;
+text-shadow: 1px 1px 1px rgba(255, 255, 255, 0.5);
+}
+#main h2{
+font-family: 'Roboto Condensed', sans-serif;
+color: #505050;
+background: linear-gradient(transparent 60%, #fff001 10%);
+text-shadow: 1px 1px 1px rgba(255, 255, 255, 0.5);
+}
+#main_desc{
+font-family: 'Open Sans', sans-serif;
+margin-bottom:3em;
+}
+.dec_img{
+margin:15px 120px;
+}
+section{
+margin-bottom:2em;
+}
+ul {
+font-family: 'Roboto Condensed', sans-serif;
+line-height: 18px;
+list-style-type: square;
+color: #333;
+text-align: left;
+}
+/* MEDIA QUERIES */
+@media only screen and (max-width: 414px) {
+section, h1 {
+display: none;
+}
+.dec_img{
+display: none;
+}
+}
+@media only screen and (max-width: 767px) {
+.dec_img{
+display: none;
+}
+}
+</style>
+</font></font>
+<article id="main" style="">
+<h1 class="heavy" style="font-family: Arial; font-size: 14pt;"><font rwr="1" style=""><font rwr="1" style=""><font style="vertical-align: inherit;"><font style="vertical-align: inherit;"><font style="vertical-align: inherit;"><font style="vertical-align: inherit;">&nbsp;duel masters </font></font></font></font></font></font><font rwr="1" style=""><font rwr="1" style=""><font style="vertical-align: inherit;"><font style="vertical-align: inherit;"><font style="vertical-align: inherit;"><font style="vertical-align: inherit;">&nbsp;Japanese&nbsp;　</font></font></font></font></font></font></h1>
+
+<section class="shiharai" style="font-family: Arial; font-size: 14pt;">
+<h2>Payment</h2>
+
+<p><span style="font-size: large;">Managed Payments<br />
+Please make a payment with in 3 days</span></p>
+</section>
+
+<section class="hasso" style="">
+<h2 style="font-family: Arial; font-size: 14pt;">Shipping</h2>
+
+<p style="font-family: Arial; font-size: 14pt;"><span style="font-size: large;">Standard&nbsp;Shipping&nbsp;</span><br />
+Expedited Shipping</p>
+
+<h2 style="font-family: Arial; font-size: 14pt;">Description of item</h2>
+
+<p style=""><font face="Arial"><span style="font-size: 18.6667px;">Condition:&nbsp;used. There are fine scratches and the condition is beautiful.</span></font></p>
+
+<p style=""><font face="Arial"><span style="font-size: 18.6667px;">Game:&nbsp;</span></font><span style="font-size:18px;">Duel Masters TCG</span></p>
+
+<p style=""><font face="Arial"><span style="font-size: 18.6667px;">Contry: Japan</span></font></p>
+
+<p style=""><font face="Arial"><span style="font-size: 18.6667px;">Language: Japanese</span></font></p>
+</section>
+
+<section class="tyuui" style="font-family: Arial; font-size: 14pt;">
+<h2>International Buyers - Please Note</h2>
+
+<div>
+<ul style="font-size: large;">
+	<li>Import duties, taxes and charges are not included in the item price or shipping charges. These charges are the buyer&rsquo;s responsibility.</li>
+	<li>Please check with your country&rsquo;s customs office to determine what these additional costs will be prior to bidding/buying.</li>
+	<li>These charges are normally collected by the delivering freight (shipping) company or when you pick the item up - do not confuse them for additional shipping charges.</li>
+	<li>We do not mark merchandise values below value or mark items as &ldquo;gifts&rdquo; - US and International government regulations prohibit such behavior.</li>
+</ul>
+</div>
+</section>
+</article>
+
+<div id="tt" style="opacity: 0; display: none; width: 300px; top: 690px; left: 432px;">
+<div id="tttop">&nbsp;</div>
+
+<div id="ttcont" style="font-size: 100%;">used. Good product condition.</div>
+
+<div id="ttbot">&nbsp;</div>
+</div>
+
+<div id="tt" style="opacity: 0; display: none; width: 300px; top: 3px; left: 177px;">
+<div id="tttop">&nbsp;</div>
+
+<div id="ttcont" style="font-size: 100%;">Sony PlayStation 1</div>
+
+<div id="ttbot">&nbsp;</div>
+</div>
+
+<div id="gtx-trans" style="position: absolute; left: 90px; top: 421.614px;">
+<div class="gtx-trans-icon">&nbsp;</div>
+</div>
