@@ -231,27 +231,8 @@ with col_result:
             if up_images:
                 for img in up_images[:3]: prompt_parts.append(genai.upload_file(io.BytesIO(img.read()), mime_type="image/jpeg"))
 
-try:
-                # --- ここから追加・修正 ---
-                # 動画や画像などのファイルをAIが読み取れる形式に変換
-                processed_parts = []
-                for part in prompt_parts:
-                    # もし中身がアップロードされたファイル（BytesIOなど）の場合
-                    if hasattr(part, "getvalue"):
-                        # mime_typeは動画なら "video/mp4"、画像なら "image/jpeg" など適切に設定
-                        # ここでは動画と仮定していますが、汎用的に bytes データとして渡します
-                        processed_parts.append({
-                            "mime_type": "video/mp4", # 動画ファイルの場合
-                            "data": part.getvalue()
-                        })
-                    else:
-                        # 普通のテキスト（プロンプトなど）はそのまま追加
-                        processed_parts.append(part)
-
-                # 修正した processed_parts を渡す
-                response = model.generate_content(processed_parts)
-                # --- ここまで修正 ---
-
+            try:
+                response = model.generate_content(prompt_parts)
                 ai_text = response.text
                 st.markdown(ai_text)
                 
