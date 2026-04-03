@@ -3,3 +3,4 @@ matplotlib
 pandas
 numpy
 google-generativeai
+fpdf
