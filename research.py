@@ -10,10 +10,17 @@ import tempfile
 import os
 
 # --- 1. API・モデル設定 ---
-GOOGLE_API_KEY = "AIzaSyBq-6tn5iHfHUDZfPDLSIY2vuoXR-IBA2M" 
+# 直接書き込まず、StreamlitのSecretsから安全に読み込む
+if "GOOGLE_API_KEY" in st.secrets:
+    GOOGLE_API_KEY = st.secrets["GOOGLE_API_KEY"]
+else:
+    st.error("APIキーが設定されていません。Streamlit CloudのSettings > Secrets に GOOGLE_API_KEY を登録してください。")
+    st.stop()
+
 genai.configure(api_key=GOOGLE_API_KEY)
-MODEL_NAME = 'models/gemini-flash-latest' 
+MODEL_NAME = 'gemini-1.5-flash' # 最新の推奨名に変更
 model = genai.GenerativeModel(MODEL_NAME)
+
 
 # --- 2. ページ・フォント設定 ---
 st.set_page_config(page_title="バドミントン精密診断 Ultra Pro+", layout="wide")
