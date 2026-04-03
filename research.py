@@ -18,7 +18,7 @@ else:
     st.stop()
 
 genai.configure(api_key=GOOGLE_API_KEY)
-MODEL_NAME = 'gemini-1.5-flash' # 最新の推奨名に変更
+MODEL_NAME = 'models/gemini-flash-latest' # 最新の推奨名に変更
 model = genai.GenerativeModel(MODEL_NAME)
 
 
