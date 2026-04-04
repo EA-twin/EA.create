@@ -71,70 +71,56 @@ with col_p:
 
 # --- 演算エンジン ---
 def calculate_all_logic(age, years, grip, weight, ten, gauge, vol, h_list, has_bug, pattern):
-    # 1. 年齢による「身体剛性」と「機材許容値」の算出
-    # 年齢が高くなる、または低すぎる（ジュニア）と、高テンションへの耐性が下がる
+    # 1. 年齢補正
     age_stiffness_factor = 1.0
     if age < 15:
-        age_stiffness_factor = 0.7 + (age / 50)  # ジュニアは骨が柔らかく高テンションに負ける
+        age_stiffness_factor = 0.7 + (age / 50)
     elif age > 45:
-        age_stiffness_factor = max(0.6, 1.0 - (age - 45) * 0.015) # シニアは腱の弾力が低下
+        age_stiffness_factor = max(0.6, 1.0 - (age - 45) * 0.015)
 
-    # 年齢と経験を考慮した理想テンション
+    # 理想テンション算出
     experience_factor = (years - 5) * 0.2
-    # 年齢による減衰を反映（高齢者や子供が無理に高テンションを張ると不適合度が増す）
     ideal_ten = ((grip * 0.4) + 10 + experience_factor) * age_stiffness_factor
     ten_diff = abs(ten - ideal_ten)
     
-    # 2. 年齢別の「理想のガット太さ」
-    # ジュニア：反発力重視（細め）、シニア：衝撃吸収重視（標準〜太め）、現役層：パワー重視
-    if age < 13:
-        ideal_gauge = 0.61
-    elif age > 50:
-        ideal_gauge = 0.68  # 衝撃を逃がすために太めを推奨
-    elif grip > 55:
-        ideal_gauge = 0.68
-    elif grip < 35:
-        ideal_gauge = 0.61
-    else:
-        ideal_gauge = 0.66
+    # 理想ガット太さ算出
+    if age < 13: ideal_gauge = 0.61
+    elif age > 50: ideal_gauge = 0.68
+    elif grip > 55: ideal_gauge = 0.68
+    elif grip < 35: ideal_gauge = 0.61
+    else: ideal_gauge = 0.66
     
     gauge_diff = abs(gauge - ideal_gauge)
-    gauge_suitability = 8 - (gauge_diff * 120) # 年齢不一致によるペナルティを強化
+    gauge_suitability = 8 - (gauge_diff * 120)
 
-    # 基礎適合スコア
+    # 2. スコア計算
     suit = 100 - (ten_diff * 5) + gauge_suitability
     suit -= (max(0, 25 - weight/2) * 5)
     
-    # 3. 年齢別・練習限界（耐久限界）
-    if age <= 12:
-        recovery_limit = 8 + (age * 0.5) # ジュニアは週12-14hが限界
-    elif 18 <= age <= 30:
-        recovery_limit = 25 + (years * 0.5) # 全盛期
-    else:
-        recovery_limit = max(8, 25 - (age - 30) * 0.6) # 加齢とともに低下
+    # 3. 耐久限界
+    if age <= 12: recovery_limit = 8 + (age * 0.5)
+    elif 18 <= age <= 30: recovery_limit = 25 + (years * 0.5)
+    else: recovery_limit = max(8, 25 - (age - 30) * 0.6)
 
-    # 疲労ペナルティの適用
+    # ペナルティ
     fatigue_penalty = 0
     if vol > recovery_limit:
-        over_vol = vol - recovery_limit
-        # 年齢が高い、または低いほどオーバーワークのダメージが大きい
         age_impact = 4.0 if (age < 13 or age > 50) else 2.0
-        fatigue_penalty += over_vol * age_impact
-        if has_bug: fatigue_penalty += over_vol * 1.5
+        fatigue_penalty += (vol - recovery_limit) * age_impact
+        if has_bug: fatigue_penalty += (vol - recovery_limit) * 1.5
 
     suit -= fatigue_penalty
     if has_bug: suit -= (sum(h_list) * 12)
-    
     suit = max(0, min(100, suit))
 
-    # 更生期間（若いほど早く直る）
+    # 更生期間
     rehab_m = 0.0
     if has_bug:
         base_m = (years * 0.8) * (sum(h_list) * 0.5)
         age_learning_factor = 0.4 if age < 15 else (1.0 + (max(0, age-40) * 0.02))
         rehab_m = round(base_m * age_learning_factor * (0.6 if "パターンA" in pattern else 1.5), 1)
 
-    return suit, rehab_m, recovery_limit
+    return suit, rehab_m, recovery_limit, ideal_ten, ideal_gauge
 
 # 更生パターンの取得
 fix_pattern = "修正不要"
@@ -142,7 +128,7 @@ if has_bug:
     st.divider()
     fix_pattern = st.radio("更生アプローチ", ["パターンA：徹底修正", "パターンB：並行修正"])
 
-suit_s, rehab_m, rec_lim = calculate_all_logic(age, years, grip, weight, ten, gauge, vol, h_checks, has_bug, fix_pattern)
+suit_s, rehab_m, rec_lim, i_ten, i_gauge = calculate_all_logic(age, years, grip, weight, ten, gauge, vol, h_checks, has_bug, fix_pattern)
 
 # --- 結果レポート ---
 st.divider()
@@ -156,7 +142,35 @@ else:
     c2.metric("状態", "ニュートラル")
     c3.metric("耐久限界 (週)", f"{int(rec_lim)} h")
 
-# --- ショット別アドバイス（全9項目） ---
+# --- 【新機能】機材不一致（物理的ミスマッチ）診断 ---
+st.divider()
+st.header("⚙️ 機材不一致（物理的ミスマッチ）の診断")
+col_m1, col_m2 = st.columns(2)
+
+with col_m1:
+    st.subheader("📌 テンション適合度")
+    ten_gap = ten - i_ten
+    if abs(ten_gap) < 1.5:
+        st.success(f"✅ 完璧な調整（理想値: {i_ten:.1f} lbs）")
+    elif ten_gap > 0:
+        st.error(f"🚨 テンション過多（+{ten_gap:.1f} lbs）")
+        st.write("【物理的リスク】インパクト時にガットがたわみ切らず、衝撃が筋肉を通り越して骨・関節に直撃しています。特にオフセンターショット時の振動はテニス肘の主因となります。")
+    else:
+        st.warning(f"⚠️ テンション不足（{ten_gap:.1f} lbs）")
+        st.write("【物理的リスク】ガットの復元が遅く、スイングエネルギーを吸収してしまっています。飛ばそうとして無理に手首をこねる癖（バグ）を誘発しやすくなります。")
+
+with col_m2:
+    st.subheader("📌 ガット太さ適合度")
+    if abs(gauge - i_gauge) < 0.02:
+        st.success(f"✅ 適正なゲージ（推奨: {i_gauge} mm）")
+    elif gauge > i_gauge:
+        st.info(f"ℹ️ オーバースペック（推奨: {i_gauge} mm）")
+        st.write("【物理的影響】耐久性は高いですが、空気抵抗と重量が増し、繊細なラケットワークを阻害しています。タッチ系のショットで「弾き」の感覚が鈍ります。")
+    else:
+        st.info(f"ℹ️ アンバースペック（推奨: {i_gauge} mm）")
+        st.write("【物理的影響】反発力は高いですが、強打時に面が暴れやすく、コントロールの不確実性が高まっています。あなたのパワーに対して面剛性が不足しています。")
+
+# --- ショット別アドバイス ---
 st.divider()
 st.header("👨‍🏫 ショット別：深掘りデバッグアドバイス")
 shot_logic = {
@@ -183,7 +197,6 @@ with col_coach:
     st.subheader("👨‍🏫 コーチの総評")
     if age <= 12: st.info("🐣 ジュニア：今は高テンションを避け、多彩なショットを打てる「神経系」を育てる時期です。")
     elif age >= 50: st.warning("👴 シニア：筋力より「効率」。重いラケットや高テンションは関節の敵です。")
-    
     if not has_bug: st.success("✅ フォームに大きな欠陥はありません。機材との同調を高めましょう。")
     else: st.error(f"🚨 {years}年の癖を剥がすには、練習量より「質の高い更生」が必要です。")
 
