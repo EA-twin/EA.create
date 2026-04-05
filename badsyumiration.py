@@ -36,12 +36,100 @@ with st.sidebar:
         value="4U"
     )
     ten = st.slider("テンション (lbs)", 12, 35, 24)
-    gauge = st.select_slider(
+    
+    gauge = st.slider(
         "ガットの太さ (mm)", 
-        options=[0.58, 0.61, 0.63, 0.65, 0.66, 0.68, 0.70],
-        value=0.66
+        min_value=0.58, 
+        max_value=0.70, 
+        value=0.66,
+        step=0.01
     )
     vol = st.slider("練習量 (h/週)", 0, 84, 10)
+
+# --- 演算エンジン ---
+def calculate_all_logic(age, years, grip, weight, ten, gauge, vol, h_list, h_severity, has_bug, pattern, r_weight_class, pain_count, has_pain):
+    weight_map = {"F (超軽量)": 73, "5U": 78, "4U": 83, "3U": 88, "2U (重量級)": 93}
+    current_w = weight_map[r_weight_class]
+    
+    if grip < 25: ideal_w = 78
+    elif grip > 50: ideal_w = 88
+    else: ideal_w = 83
+    
+    age_stiffness_factor = 1.0
+    if age < 15:
+        age_stiffness_factor = 0.7 + (age / 50)
+    elif age > 45:
+        age_stiffness_factor = max(0.6, 1.0 - (age - 45) * 0.015)
+
+    experience_factor = (years - 5) * 0.2
+    if grip <= 20:
+        ideal_gauge = 0.61 
+    elif grip < 35:
+        ideal_gauge = 0.66 if years >= 8 else 0.61
+    elif grip > 55:
+        ideal_gauge = 0.68
+    else:
+        ideal_gauge = 0.66
+
+    ideal_ten = ((grip * 0.4) + 10 + experience_factor) * age_stiffness_factor
+    
+    if has_pain:
+        ideal_ten -= 2.0
+    
+    weight_diff = current_w - ideal_w
+    ten_diff = ten - ideal_ten 
+    gauge_diff = gauge - ideal_gauge
+    
+    base_power = (grip * 1.5) + (weight * 0.2)
+    weight_p_bonus = (current_w - 83) * 1.8
+    gauge_p_impact = (0.66 - gauge) * 100 
+    
+    if ten_diff > 0:
+        ten_p_impact = -(ten_diff ** 1.3) * 1.5
+    else:
+        ten_p_impact = abs(ten_diff) * 1.2 if abs(ten_diff) < 5 else 6.0 - (abs(ten_diff)-5)
+
+    power_score = max(10, min(100, base_power + weight_p_bonus + gauge_p_impact + ten_p_impact))
+
+    weight_diff_penalty = abs(weight_diff) * 3.0
+    effective_ten_diff = max(0, abs(ten_diff) - 0.5)
+    ten_mismatch_penalty = effective_ten_diff * 5.0
+    effective_gauge_diff = max(0, abs(gauge_diff) - 0.01)
+    gauge_mismatch_penalty = effective_gauge_diff * 150.0
+
+    suit = 100 - (weight_diff_penalty + ten_mismatch_penalty + gauge_mismatch_penalty)
+    suit -= (max(0, 25 - weight/2) * 5)
+    
+    if age <= 12: recovery_limit = 8 + (age * 0.5)
+    elif 18 <= age <= 30: recovery_limit = 25 + (years * 0.5)
+    else: recovery_limit = max(8, 25 - (age - 30) * 0.6)
+
+    weight_fatigue_mult = 1.0 + (current_w - 83) * 0.04 
+    effective_recovery_limit = recovery_limit / max(0.8, weight_fatigue_mult)
+    
+    if vol > effective_recovery_limit:
+        age_impact = 4.0 if (age < 13 or age > 50) else 2.0
+        suit -= (vol - effective_recovery_limit) * age_impact
+    
+    if has_bug: suit -= (h_severity * 10)
+    
+    suit = max(0, min(100, suit))
+
+    rehab_m = 0.0
+    if has_bug:
+        base_m = (years * 0.7) * (h_severity * 0.4)
+        age_learning_factor = 0.4 if age < 15 else (1.0 + (max(0, age-40) * 0.02))
+        vol_factor = 1.8 if vol < 3 else (0.8 if vol <= effective_recovery_limit else 1.3)
+        gear_obs_factor = 1.0 + (abs(weight_diff) * 0.07)
+        rehab_m = round(base_m * age_learning_factor * vol_factor * gear_obs_factor * (0.6 if "パターンA" in pattern else 1.5), 1)
+
+    s_score = max(10, min(100, 100 - (vol / effective_recovery_limit * 35 if vol > 0 else 0)))
+    
+    weight_injury_risk = abs(weight_diff) * 1.5
+    pain_impact = pain_count * 15
+    ir_score = max(10, min(100, 100 - (h_severity * 12) - pain_impact - weight_injury_risk))
+
+    return suit, rehab_m, effective_recovery_limit, ideal_ten, ideal_gauge, power_score, s_score, ir_score, ideal_w
 
 # --- メイン画面：チェックリスト ---
 st.header("🔍 デバッグ項目：バグと身体の状態")
@@ -75,79 +163,8 @@ with col_p:
     p_ashi = st.checkbox("膝・足首が痛い")
     
     p_checks = [p_tekubi, p_hiji, p_koshi, p_kubi, p_ashi]
-    has_pain = any(p_checks) and not p_none
-
-# --- 演算エンジン ---
-def calculate_all_logic(age, years, grip, weight, ten, gauge, vol, h_list, h_severity, has_bug, pattern, r_weight_class):
-    # 年齢補正
-    age_stiffness_factor = 1.0
-    if age < 15:
-        age_stiffness_factor = 0.7 + (age / 50)
-    elif age > 45:
-        age_stiffness_factor = max(0.6, 1.0 - (age - 45) * 0.015)
-
-    # ガット太さロジックの改善（ここが重要）
-    experience_factor = (years - 5) * 0.2
-    
-    if grip <= 20:
-        ideal_gauge = 0.61 
-    elif grip < 35:
-        # 経験が長い（8年以上）場合は、細ガットに頼りすぎない標準的な太さを推奨
-        ideal_gauge = 0.66 if years >= 8 else 0.61
-    elif grip > 55:
-        ideal_gauge = 0.68
-    else:
-        ideal_gauge = 0.66
-
-    # 理想テンション算出
-    ideal_ten = ((grip * 0.4) + 10 + experience_factor) * age_stiffness_factor
-    
-    # ラケット重量
-    weight_map = {"F (超軽量)": 73, "5U": 78, "4U": 83, "3U": 88, "2U (重量級)": 93}
-    current_w = weight_map[r_weight_class]
-    if grip < 25: ideal_w = 78
-    elif grip > 50: ideal_w = 88
-    else: ideal_w = 83
-    
-    # スコア計算
-    weight_diff_penalty = abs(current_w - ideal_w) * 0.5
-    ten_diff = abs(ten - ideal_ten)
-    gauge_diff = abs(gauge - ideal_gauge)
-    gauge_suitability = 8 - (gauge_diff * 100) 
-
-    suit = 100 - (ten_diff * 6) + gauge_suitability - weight_diff_penalty
-    suit -= (max(0, 25 - weight/2) * 5)
-    
-    # 耐久限界・練習量
-    if age <= 12: recovery_limit = 8 + (age * 0.5)
-    elif 18 <= age <= 30: recovery_limit = 25 + (years * 0.5)
-    else: recovery_limit = max(8, 25 - (age - 30) * 0.6)
-
-    weight_fatigue_mult = 1.0 + (current_w - 83) * 0.02
-    fatigue_penalty = 0
-    if vol > recovery_limit:
-        age_impact = 4.0 if (age < 13 or age > 50) else 2.0
-        fatigue_penalty += (vol - recovery_limit) * age_impact * weight_fatigue_mult
-    
-    suit -= fatigue_penalty
-    if has_bug: suit -= (h_severity * 10)
-    suit = max(0, min(100, suit))
-
-    # 更生期間
-    rehab_m = 0.0
-    if has_bug:
-        base_m = (years * 0.7) * (h_severity * 0.4)
-        age_learning_factor = 0.4 if age < 15 else (1.0 + (max(0, age-40) * 0.02))
-        vol_factor = 1.8 if vol < 3 else (0.8 if vol <= recovery_limit else 1.3)
-        gear_obs_factor = 1.0 + (max(0, current_w - ideal_w) * 0.05)
-        rehab_m = round(base_m * age_learning_factor * vol_factor * gear_obs_factor * (0.6 if "パターンA" in pattern else 1.5), 1)
-
-    # サブスコア
-    power_score = max(10, min(100, (grip * 1.5) + (weight * 0.2) + ((current_w - 83) * 0.8)))
-    s_score = max(10, min(100, 100 - (vol / recovery_limit * 30 if vol > 0 else 0)))
-    ir_score = max(10, min(100, 100 - (h_severity * 12) - (20 if has_pain else 0)))
-
-    return suit, rehab_m, recovery_limit, ideal_ten, ideal_gauge, power_score, s_score, ir_score, ideal_w
+    pain_count = sum(p_checks)
+    has_pain = pain_count > 0 and not p_none
 
 # --- ロジック実行 ---
 fix_pattern = "修正不要"
@@ -156,7 +173,7 @@ if has_bug:
     fix_pattern = st.radio("更生アプローチ", ["パターンA：徹底修正（物理矯正）", "パターンB：並行修正（妥協案）"])
 
 suit_s, rehab_m, rec_lim, i_ten, i_gauge, p_score, s_score, ir_score, i_w = calculate_all_logic(
-    age, years, grip, weight, ten, gauge, vol, h_checks, h_severity_sum, has_bug, fix_pattern, r_weight_class
+    age, years, grip, weight, ten, gauge, vol, h_checks, h_severity_sum, has_bug, fix_pattern, r_weight_class, pain_count, has_pain
 )
 
 # --- ビジュアルセクション ---
@@ -183,17 +200,18 @@ with col_rec:
     **あなたへの最適解:**
     - **ラケット重量:** {i_w_class}
     - **推奨ガット:** {i_gauge} mm
-    - **推奨テンション:** {i_ten:.1f} lbs
+    - **推奨テンション:** {i_ten:.1f} lbs {"(⚠️補正済)" if has_pain else ""}
     - **練習キャパ:** 週 {int(rec_lim)} 時間以内
     """)
     
-    if has_bug:
-        st.subheader("⏳ 更生プロセス予測")
-        if vol < 3: st.warning("⚠️ 練習不足により、新しい動きが定着しにくい状態です。")
-        elif vol > rec_lim: st.error("⚠️ 疲労により、悪い癖が強調されるリスクがあります。")
-        else: st.info("✨ 効率的なフォーム修正が可能な練習量です。")
+    weight_map = {"F (超軽量)": 73, "5U": 78, "4U": 83, "3U": 88, "2U (重量級)": 93}
+    current_w = weight_map[r_weight_class]
+    if current_w > i_w + 5:
+        st.warning(f"⚠️ 重量過多：現在の{r_weight_class}は重すぎます。")
+    elif current_w < i_w - 5:
+        st.info(f"ℹ️ 重量不足：{r_weight_class}は軽すぎます。")
 
-# --- 結果レポート ---
+# --- 詳細診断レポート ---
 st.divider()
 st.header("📋 詳細診断レポート")
 c1, c2, c3 = st.columns(3)
@@ -213,57 +231,87 @@ col_m1, col_m2, col_m3 = st.columns(3)
 with col_m1:
     st.subheader("📌 テンション")
     ten_gap = ten - i_ten
-    if abs(ten_gap) < 1.5: st.success(f"✅ 理想的（{i_ten:.1f} lbs）")
+    if abs(ten_gap) <= 0.5:
+        st.success(f"✅ 理想的（{i_ten:.1f} lbs）")
     elif ten_gap > 0: st.error(f"🚨 硬すぎ（+{ten_gap:.1f}）")
     else: st.warning(f"⚠️ 緩すぎ（{ten_gap:.1f}）")
 
 with col_m2:
     st.subheader("📌 ガット太さ")
-    if abs(gauge - i_gauge) < 0.02: st.success(f"✅ 適正（{i_gauge} mm）")
+    if abs(gauge - i_gauge) <= 0.01:
+        st.success(f"✅ 適正（{i_gauge} mm）")
     else: st.info(f"ℹ️ 推奨: {i_gauge} mm")
 
 with col_m3:
     st.subheader("📌 ラケット重量")
     if r_weight_class == i_w_class: st.success(f"✅ 適正（{r_weight_class}）")
-    else: st.warning(f"⚠️ 理想は {i_w_class}")
+    else:
+        diff_g = weight_map[r_weight_class] - weight_map[i_w_class]
+        st.warning(f"⚠️ 理想は {i_w_class} ({'+' if diff_g>0 else ''}{diff_g}gの乖離)")
 
-# --- ショット別アドバイス（全記載） ---
-st.divider()
-st.header("👨‍🏫 ショット別：深掘りデバッグアドバイス")
-shot_logic = {
-    "スマッシュ": {"bug": "体幹連動なし。胸の開きが不十分で、腕力に頼りすぎています。", "neutral": "握り込みのタイミングを追求。ラケットの重量をシャトルに伝える感覚を磨いて。"},
-    "ハイバック": {"bug": "肘を支点にした回外が使えていません。無理に打つと肘を壊します。", "neutral": "脱力が鍵。肩の入れ替えとラケットの重みを利用したスイングを。"},
-    "ドライブ": {"bug": "反応が遅れ気味。テイクバックを最小限にし、コンパクトに。", "neutral": "面の角度と指先の弾きだけでコースを打ち分けてください。"},
-    "クリア": {"bug": "打点が低く、肘が伸びきった状態で打っています。物理ロスが大きいです。", "neutral": "最高打点で。腹筋の収縮をスイングの始点に。"},
-    "ヘアピン": {"bug": "タッチが硬い。指先でコルクを撫でるような柔軟性を。", "neutral": "ネットギリギリを通過する軌道をイメージして「静」の操作を。"},
-    "ドロップ": {"bug": "スマッシュとフォームが変わりすぎているため、相手に読まれています。", "neutral": "スイングスピードを維持しつつ、インパクト直前で力を抜く「隠し」を。"},
-    "プッシュ": {"bug": "振り回しすぎてオーバー。ネット前は指の握り込みだけで加速させます。", "neutral": "「刺す」イメージ。フォロースルーは不要です。"},
-    "レシーブ": {"bug": "重心が高い。股関節を使い、ラケットを立てた状態で待ち構えて。", "neutral": "相手のパワーを利用し、面の角度だけで返球する効率性を。"},
-    "バックハンド": {"bug": "親指の使い方が甘く、面のコントロールを失っています。", "neutral": "親指の押し出しによるパワー伝達と、前腕の回転を同期させて。"}
-}
-for shot, adv in shot_logic.items():
-    with st.expander(f"🎯 {shot} の診断"):
-        st.write(f"⚠️ **バグ発生時:** {adv['bug']}" if has_bug else f"✨ **適正状態:** {adv['neutral']}")
-
-# --- 治療師アドバイス（全記載） ---
+# --- 治療師アドバイス（動的修正版） ---
 st.divider()
 st.header("👨‍⚕️ 専門家によるコンディショニング指示")
 col_coach, col_doc = st.columns(2)
 
 with col_coach:
     st.subheader("👨‍🏫 コーチの総評")
-    if age <= 12: st.info("🐣 ジュニア期：高テンションは関節の成長を阻害します。今はコントロール重視で。")
-    elif age >= 50: st.warning("👴 シニア期：筋力低下を補うため、軽量ラケットと高反発ガットで効率化を。")
-    if not has_bug: st.success("✅ 基礎は安定しています。次は「意図的なミスマッチ」で球質を変える段階です。")
-    else: st.error(f"🚨 現在のバグは、重すぎる機材や高すぎるテンションで「力み」を誘発している可能性があります。")
+    if age <= 12:
+        st.info("🐣 ジュニア期：骨格が成長中です。今はパワーより「シャトルの芯を捉える感覚」を養ってください。")
+    elif age >= 55:
+        st.warning("👴 シニア期：筋力よりも「効率的な脱力」が武器になります。無理な強打は避けましょう。")
+    
+    if not has_bug:
+        st.success("✅ フォームに目立ったバグはありません。現在のOSをベースに精度を高めましょう。")
+    else:
+        st.error("🚨 警告：技術的な癖によるエネルギーロスが発生しています。")
+        # 選択されたバグに応じたアドバイス
+        if h_western: st.write("- **ウエスタン対策:** バック側の打球で手首を痛めるリスク大。グリップの矯正が急務。")
+        if h_teuchi: st.write("- **手打ち対策:** 遠心力が使えていません。下半身からのパワー伝達が必要です。")
+        if h_hiji: st.write("- **肘の伸び対策:** 肩甲骨の可動域が制限されています。打点を少し前へ。")
+        if h_neko: st.write("- **猫手対策:** 手首の柔軟性が死んでいます。リラックスした構えを。")
 
 with col_doc:
     st.subheader("🏥 身体管理")
+    # 痛みがある場合
     if has_pain:
-        st.error("🚨 警告：現在の痛みは、物理的な不一致による代償動作（無理な動き）のサインです。")
-        st.write("- 痛みが引くまでテンションを2lbs下げることを強く推奨。")
+        st.error(f"🚨 警告：身体の {pain_count} 箇所に痛みがあります。")
+        st.warning(f"💡 【処方】関節保護のため、推奨テンションを通常より **2.0 lbs 下げた {i_ten:.1f} lbs** に補正しました。")
+        if p_hiji or p_tekubi:
+            st.write("- **上肢管理:** インパクト時の振動が直接関節に届いています。太いガットへの変更も検討。")
+        if p_koshi or p_ashi:
+            st.write("- **下肢・体幹管理:** フットワークの着地衝撃が吸収できていません。インソールの見直しを。")
+    # 痛みはないがバグがある場合（潜在的なリスク）
+    elif has_bug:
+        st.warning("⚠️ 潜在的リスク：現在は痛みがないようですが、フォームのバグが関節に負担をかけています。")
+        if h_teuchi or h_dead:
+            st.write("- 肩や肘への負荷を逃がすために、テンションを1〜2lbs下げる「予防的措置」も有効です。")
+        if h_bo or h_ashi:
+            st.write("- 足が止まっているため、上半身だけでシャトルを追う癖がついています。膝への負担に注意。")
+    # 痛みもバグもない場合
     else:
-        st.success("✅ 身体の連動が保たれています。")
+        st.success("✅ 身体の連動・コンディション共に良好です。現在の強度で練習を継続可能です。")
     
+    # 練習量に関する警告
     if vol > rec_lim:
-        st.error(f"🚨 練習過多：現在のリカバリー能力（週{int(rec_lim)}h）を超えています。休養も練習の一部です。")
+        st.error(f"🚨 オーバーワーク（週 {vol}h）：リカバリー限界（週 {int(rec_lim)}h）を超過しています。")
+    elif vol > rec_lim * 0.8:
+        st.warning("⚠️ 負荷高め：練習量が限界に近いです。積極的休養（睡眠・ストレッチ）を優先してください。")
+
+# --- ショット別アドバイス ---
+st.divider()
+st.header("👨‍🏫 ショット別：深掘りデバッグアドバイス")
+shot_logic = {
+    "スマッシュ": {"bug": "体幹連動なし。腕力に頼りすぎです。", "neutral": "ラケットの重量とガットの反発を同期させて。"},
+    "ハイバック": {"bug": "回外が使えていません。無理は禁物。", "neutral": "肩の入れ替えと脱力を意識。"},
+    "ドライブ": {"bug": "反応遅れ。コンパクトなスイングを。", "neutral": "指先の弾きでコースを打ち分けて。"},
+    "クリア": {"bug": "打点が低い。物理ロス大。", "neutral": "最高打点で腹筋を使って。"},
+    "ヘアピン": {"bug": "タッチが硬い。指先の柔軟性を。", "neutral": "コルクを撫でるイメージ。"},
+    "ドロップ": {"bug": "フォームでバレています。", "neutral": "インパクト直前の減速を隠して。"},
+    "プッシュ": {"bug": "振り回しすぎ。握り込みで加速。", "neutral": "フォロースルーを抑えて「刺す」。"},
+    "レシーブ": {"bug": "重心が高い。股関節を使って。", "neutral": "面の角度だけで返球。"},
+    "バックハンド": {"bug": "親指の使い方が甘い。", "neutral": "前腕の回転と同期させて。"}
+}
+for shot, adv in shot_logic.items():
+    with st.expander(f"🎯 {shot} の診断"):
+        st.write(f"⚠️ **バグ発生時:** {adv['bug']}" if has_bug else f"✨ **適正状態:** {adv['neutral']}")
